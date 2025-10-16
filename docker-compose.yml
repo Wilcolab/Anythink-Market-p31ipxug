@@ -1,9 +1,52 @@
+version: "3.8"
+
 services:
   python-server:
     build:
       context: ./python-server
       dockerfile: Dockerfile
+    container_name: anythink-python
     ports:
-      - 8000:8000
+      - "8001:8001"
     volumes:
-      - ./python-server/src:/app/src
+      # Mount the entire service directory so the app entrypoint and modules are available
+      - ./python-server:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - db
+    restart: unless-stopped
+    healthcheck:
+      # lightweight healthcheck using Python (no curl required)
+      test: ["CMD", "python", "-c", "import socket,sys; s=socket.socket(); s.settimeout(1); s.connect(('127.0.0.1',8001)); s.close()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8001 --reload
+    networks:
+      - app-network
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
