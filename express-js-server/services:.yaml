@@ -1,0 +1,21 @@
+services:
+  python-server:
+    build:
+      context: ./python-server
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./python-server/src:/app/src
+
+  express-js-server:
+    build:
+      context: ./express-js-server
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./express-js-server:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
