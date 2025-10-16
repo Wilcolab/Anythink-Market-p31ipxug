@@ -1,17 +1,17 @@
-# Use the official Python base image
-FROM python:3.9-slim
+FROM node:18-alpine
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the dependencies file to the working directory
-COPY requirements.txt /app
+# Copy package manifests and install dependencies
+COPY package.json package-lock.json* ./
+RUN npm install --production
 
-# Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy application source
+COPY . .
 
-# Expose the port on which the server will run
+# Expose port
 EXPOSE 8000
 
-# Set the command to run the server
-CMD ["uvicorn", "src.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+# Start the server
+CMD ["node", "src/index.js"]
