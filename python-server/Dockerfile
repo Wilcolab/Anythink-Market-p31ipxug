@@ -1,4 +1,4 @@
-# Use the official Python base image
+# ...existing code...
 FROM python:3.9-slim
 
 # Set the working directory in the container
@@ -11,7 +11,11 @@ COPY requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port on which the server will run
-EXPOSE 8000
+EXPOSE 8001
 
-# Set the command to run the server
-CMD ["uvicorn", "src.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+# Copy application files
+COPY . /app
+
+# Set the command to run the server on port 8001
+CMD ["uvicorn", "src.main:app", "--reload", "--host", "0.0.0.0", "--port", "8001"]
+# ...existing code...
