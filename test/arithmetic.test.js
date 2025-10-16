@@ -94,7 +94,72 @@ describe('Arithmetic', function () {
     });
 
 // TODO: Challenge #1
- 
+describe('Subtraction', function () {
+    it('subtracts two positive integers', function (done) {
+        request.get('/arithmetic?operation=subtract&operand1=21&operand2=21')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 0 });
+                done();
+            });
+    });
+    it('subtracts a larger integer from a smaller one', function (done) {
+        request.get('/arithmetic?operation=subtract&operand1=21&operand2=42')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: -21 });
+                done();
+            });
+    });
+    it('subtracts a negative integer', function (done) {
+        request.get('/arithmetic?operation=subtract&operand1=21&operand2=-21')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 42 });
+                done();
+            });
+    });
+    it('subtracts floating point numbers', function (done) {
+        request.get('/arithmetic?operation=subtract&operand1=2.5&operand2=5')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: -2.5 });
+                done();
+            });
+    });
+    it('subtracts with negative exponent resulting in zero', function (done) {
+        request.get('/arithmetic?operation=subtract&operand1=1.2e-5&operand2=1.2e-5')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 0 });
+                done();
+            });
+    });
+    it('accepts leading plus sign on operands', function (done) {
+        request.get('/arithmetic?operation=subtract&operand1=+5&operand2=2')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 3 });
+                done();
+            });
+    });
+    it('rejects missing operand2', function (done) {
+        request.get('/arithmetic?operation=subtract&operand1=21')
+            .expect(400)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ error: "Invalid operand2: undefined" });
+                done();
+            });
+    });
+    it('handles subtraction of very large integers (MAX_SAFE_INTEGER)', function (done) {
+        request.get('/arithmetic?operation=subtract&operand1=9007199254740991&operand2=1')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 9007199254740990 });
+                done();
+            });
+    });
+});
 
     describe('Multiplication', function () {
         it('multiplies two positive integers', function (done) {
