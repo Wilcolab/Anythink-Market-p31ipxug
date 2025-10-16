@@ -5,20 +5,22 @@ services:
     build:
       context: ./python-server
       dockerfile: Dockerfile
+    container_name: anythink-python
     ports:
       - "8000:8000"
+      - "8001:8001"
     volumes:
-      - ./python-server/src:/app/src
+      # Mount the entire service directory so the app entrypoint and modules are available
+      - ./python-server:/app
     environment:
-      # example env vars; adjust as needed
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
       - PYTHONUNBUFFERED=1
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      # lightweight healthcheck using Python (no curl required)
+      test: ["CMD", "python", "-c", "import socket,sys; s=socket.socket(); s.settimeout(1); s.connect(('127.0.0.1',8000)); s.close()"]
       interval: 30s
       timeout: 5s
       retries: 3
