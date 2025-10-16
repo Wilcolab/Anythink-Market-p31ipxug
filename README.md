@@ -4,6 +4,23 @@ This project contains a FastAPI server implemented in Python. It provides two ro
 
 ## Project Structure
 
+- node-server/ — Node.js application
+  - src/
+    - index.js — Express server implementing routes and listening on port 8001 (`app.listen(8001)`).
+  - package.json — Node dependencies and start script (e.g., `node src/index.js` or `npm start`).
+  - Dockerfile — Builds the Node image and exposes port 8001.
+  - docker-compose.yml — (or main docker-compose) includes the node service and maps container port 8001 to the host (e.g., `8001:8001`).
+
+Note: The Node server runs on port 8001. When using docker compose, access it at http://localhost:8001 (or the host forwarded port).
+  - src/
+    - main.py — FastAPI application implementing two routes: `POST /tasks` (add a task) and `GET /tasks` (list tasks).
+    - __init__.py — package marker.
+  - requirements.txt — Python dependencies required by the server (e.g., FastAPI, Uvicorn).
+  - Dockerfile — Docker image definition used to build and run the FastAPI server.
+- docker-compose.yml — Defines the service for the FastAPI app, builds the image and exposes port 8000 for access.
+
+This layout keeps the application code, dependencies, and container configuration separate for easy development and deployment.
+
 The project has the following files and directories:
 
 - `python-server/src/main.py`: This file contains the implementation of the FastAPI server with two routes. It handles adding a task to a list and retrieving the list.
